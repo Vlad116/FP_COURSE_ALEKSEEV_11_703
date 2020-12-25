@@ -70,11 +70,16 @@ prob3 step n = prob3 step (step n) + 1
 --
 -- Число n по модулю не превосходит 10^5
 prob4 :: Integer -> Integer
-prob4 n = helper 0 1 n
-  where helper curr prev n
-          | n == 0   = curr
-          | n > 0    = helper (curr+prev) curr (n-1)
-          | n < 0    = helper prev (curr-prev) (n+1)
+prob4 n = fib n
+    where
+        fib 0 = 1
+        fib 1 = 1
+        fib n = if n > 0
+          then fib(n - 1) + fib(n - 2)
+          else fib(-n - 2) * (if even n then 1 else -1)          
+
+-- prob4 1 = 1
+-- prob4 0 = 1
 
 ------------------------------------------------------------
 -- PROBLEM #5
@@ -85,11 +90,14 @@ prob4 n = helper 0 1 n
 -- Числа n и k положительны и не превосходят 10^8.
 -- Число 1 не считается простым числом
 prob5 :: Integer -> Integer -> Bool
-prob5 n k = all (< k) (gretestPrimeDivisors n 2)
+prob5 n k = all (< k) (primeDivisors n)
     where
-        gretestPrimeDivisors :: Integer -> Integer -> [Integer] 
-        gretestPrimeDivisors 1 i = []
-        gretestPrimeDivisors = n i
-            | i * i > n = [n]
-            | n `mod` i == 0 = [i] ++ gretestPrimeDivisors (n `div` i) i
-            | otherwise = gretestPrimeDivisors n (i + 1) 
+        primeDivisors :: Integer -> [Integer]
+        primeDivisors = currentDivisors 2
+
+        currentDivisors :: Integer -> Integer -> [Integer]
+        currentDivisors _ 1 = []
+        currentDivisors d num
+            | d * d > num = [num]
+            | num `mod` d == 0 = d : currentDivisors d (num `div` d)
+            | otherwise = currentDivisors (d + 1) num
